@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Resultados</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="/socket.io/socket.io.js"></script>
+  <style>
+    .resultado-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: stretch;
+      margin-top: 2rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .tarjeta-candidato {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      padding: 15px 20px;
+      font-size: 1.2rem;
+      color: #000000;
+      transition: transform 0.3s ease, background-color 0.3s ease;
+      position: relative;
+    }
+
+    .tarjeta-candidato:hover {
+      transform: scale(1.02);
+    }
+
+    .nombre-candidato {
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .barra-votos {
+      background-color: #28a745;
+      height: 14px;
+      border-radius: 8px;
+      transition: width 0.5s ease;
+    }
+
+    .barra-container {
+      background-color: #e0e0e0;
+      border-radius: 8px;
+      height: 14px;
+      overflow: hidden;
+    }
+
+    .animacion-voto {
+      animation: resaltar 0.8s ease;
+    }
+
+    @keyframes resaltar {
+      0%   { background-color: #f8fa99; transform: scale(1.05); }
+      50%  { background-color: #FFFF00; transform: scale(1.08); }
+      100% { background-color: white; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <h1>Resultados</h1>
+  <div id="resultados" class="resultado-container"></div>
+
+  <script>
+    const socket = io();
+    const resultadosDiv = document.getElementById("resultados");
+    let resultadosPrevios = [];
+
+    function actualizarResultados(datos) {
+      datos.sort((a, b) => b.votos - a.votos);
+
+      const totalVotos = datos.reduce((sum, c) => sum + c.votos, 0) || 1;
+
+      resultadosDiv.innerHTML = '';
+
+      datos.forEach((c) => {
+        const div = document.createElement("div");
+        div.className = "tarjeta-candidato";
+
+        // Si tiene más votos que antes, añadir animación
+        const candidatoPrevio = resultadosPrevios.find(p => p.nombre === c.nombre);
+        if (candidatoPrevio && c.votos > candidatoPrevio.votos) {
+          div.classList.add("animacion-voto");
+        }
+
+        const nombre = document.createElement("div");
+        nombre.className = "nombre-candidato";
+        nombre.textContent = `${c.nombre}: ${c.votos} votos`;
+
+        const barraContainer = document.createElement("div");
+        barraContainer.className = "barra-container";
+
+        const barra = document.createElement("div");
+        barra.className = "barra-votos";
+        barra.style.width = `${(c.votos / totalVotos) * 100}%`;
+
+        barraContainer.appendChild(barra);
+        div.appendChild(nombre);
+        div.appendChild(barraContainer);
+        resultadosDiv.appendChild(div);
+      });
+
+      resultadosPrevios = JSON.parse(JSON.stringify(datos));
+    }
+
+    socket.on("actualizarResultados", (datos) => {
+      actualizarResultados(datos);
+    });
+
+    socket.on("nuevoVoto", () => {
+      fetch("/admin/resultados-actuales")
+        .then((res) => res.json())
+        .then((data) => actualizarResultados(data));
+    });
+
+    fetch("/admin/resultados-actuales")
+      .then((res) => res.json())
+      .then((data) => {
+        resultadosPrevios = JSON.parse(JSON.stringify(data));
+        actualizarResultados(data);
+      });
+  </script>
+</body>
+</html>

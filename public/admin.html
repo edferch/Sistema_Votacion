@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel de Administrador</title>
+  <link rel="stylesheet" href="/styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <h1>Administrador - Sistema de Votación</h1>
+
+  <!-- Inicio de sesión (simple, con clave) -->
+  <div id="login-section">
+    <h2>Ingresar</h2>
+    <input type="password" id="admin-pass" placeholder="Contraseña">
+    <button onclick="login()">Entrar</button>
+    <p id="login-msg"></p>
+  </div>
+
+  <!-- Panel solo visible si se inicia sesión -->
+  <div id="admin-panel" style="display:none;">
+    <h2>Crear nueva votación</h2>
+    <input type="text" id="nombre-votacion" placeholder="Nombre de la directiva">
+    <button onclick="crearVotacion()">Crear</button>
+
+    <div id="candidatos-section" style="display:none;">
+      <h3>Agregar candidatos</h3>
+
+      <!-- Nuevo textarea para múltiples candidatos -->
+      <textarea id="nombres-candidatos" placeholder="Escribe un nombre por línea" rows="5" cols="30"></textarea>
+      <br>
+      <button onclick="agregarCandidatos()">Agregar todos</button>
+
+      <!-- Lista de candidatos -->
+      <ul id="lista-candidatos"></ul>
+
+      <button onclick="activarVotacion()">✅ Activar votación</button>
+      <button onclick="desactivarVotacion()">⛔ Finalizar votación</button>
+
+      <h3>Agregar voto manual</h3>
+      <select id="voto-manual-select"></select>
+      <input type="number" id="cantidad-votos" placeholder="Cantidad de votos" min="1" value="1" style="width: 100px;">
+      <button onclick="agregarVotoManual()">Agregar voto</button>
+    </div>
+  </div>
+
+  <script src="/scripts/admin.js"></script>
+</body>
+</html>

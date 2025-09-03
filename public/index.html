@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Votación</title>
+  <link rel="stylesheet" href="/styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <h1 id="nombre-votacion">Cargando...</h1>
+
+  <div id="candidatos-container"></div>
+
+  <h2 id="mensaje"></h2>
+
+  <script src="/scripts/votar.js"></script>
+</body>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+
+  socket.on('votacionCambiada', () => {
+    console.log('La votación cambió, recargando...');
+    window.location.reload();
+  });
+</script>
+</html>
