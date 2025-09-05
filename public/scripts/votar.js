@@ -35,31 +35,37 @@ fetch('/admin/votacion-activa')
   });
 
 function votar(candidatoID) {
-  if (!confirm("¿Estás seguro de tu voto?")) return;
+  const modal = document.getElementById("modal-confirmacion");
+  const btnCancelar = document.getElementById("btn-cancelar");
+  const btnConfirmar = document.getElementById("btn-confirmar");
 
-  fetch('/votar', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      votacion_id: votacionID,
-      candidato_id: candidatoID,
-      fingerprint
+  // Mostrar modal
+  modal.style.display = "flex";
+
+  // Cancelar
+  btnCancelar.onclick = () => {
+    modal.style.display = "none";
+  };
+
+  // Confirmar
+  btnConfirmar.onclick = () => {
+    modal.style.display = "none";
+
+    // Aquí ya mandamos el voto
+    fetch('/votar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        votacion_id: votacionID,
+        candidato_id: candidatoID,
+        fingerprint
+      })
     })
-  })
-  .then(res => res.json())
-  .then(data => {
-    document.getElementById("mensaje").textContent = data.mensaje;
-    document.getElementById("candidatos-container").innerHTML = "";
-  })
-  .catch(err => console.error(err));
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("mensaje").textContent = data.mensaje;
+      document.getElementById("candidatos-container").innerHTML = "";
+    })
+    .catch(err => console.error(err));
+  };
 }
-
-db.all(
-  'SELECT candidatos.nombre, COUNT(votos.id) as votos FROM candidatos LEFT JOIN votos ON candidatos.id = votos.candidato_id WHERE candidatos.votacion_id = ? GROUP BY candidatos.id',
-  [votacion_id],
-  (err2, rows) => {
-    if (!err2) {
-      io.emit('actualizarResultados', rows);
-    }
-  }
-);
