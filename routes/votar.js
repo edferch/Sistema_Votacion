@@ -13,7 +13,7 @@ router.post('/', (req, res) => {
     (err, row) => {
       if (err) return res.status(500).json({ error: 'Error de base de datos' });
       if (row) {
-        return res.json({ mensaje: 'Ya votaste en esta elección' });
+        return res.json({ mensaje: 'Ya votaste en esta elección', exito: false });
       }
 
       db.run(
@@ -36,7 +36,7 @@ router.post('/', (req, res) => {
             }
           );
 
-          res.json({ mensaje: '¡Voto registrado!' });
+          res.json({ mensaje: '¡Voto registrado!', exito: true });
         }
       );
     }

@@ -63,8 +63,25 @@ function votar(candidatoID) {
     })
     .then(res => res.json())
     .then(data => {
-      document.getElementById("mensaje").textContent = data.mensaje;
       document.getElementById("candidatos-container").innerHTML = "";
+
+      const modalResultado = document.getElementById("modal-resultado");
+      const modalMensaje = document.querySelector("#modal-resultado #modal-mensaje");
+      const modalIcono = document.getElementById("modal-icono");
+
+      modalMensaje.textContent = data.mensaje;
+
+      if (data.exito) {
+        modalIcono.innerHTML = `<i class="fa-solid fa-circle-check" style="color: green; font-size: 40px;"></i>`;
+      } else {
+        modalIcono.innerHTML = `<i class="fa-solid fa-circle-xmark" style="color: red; font-size: 40px;"></i>`;
+      }
+
+      modalResultado.style.display = "flex";
+
+      modalResultado.onclick = () => {
+        modalResultado.style.display = "none";
+      };
     })
     .catch(err => console.error(err));
   };
